@@ -1,6 +1,6 @@
 package com.accenture.temporalio.quarkus.runtime;
 
-import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItems;
+import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.Startup;
 import io.temporal.client.WorkflowClient;
@@ -37,11 +37,11 @@ public class TemporalProducer {
 
     @Produces
     @Startup
-    public Worker temporalWorker(WorkerFactory workerFactory, TemporalBuildItems worklowBuildItens) {
+    public Worker temporalWorker(WorkerFactory workerFactory, TemporalBuildItem worklowBuildItens) {
         // Worker that listens on a task queue and hosts both workflow and activity implementations.
         var worker = workerFactory.newWorker("quarkus-temporal-worker");
 
-        System.out.println(worklowBuildItens);
+        System.out.println("itens" + worklowBuildItens);
 
         // Workflows are stateful. So you need a type to create instances.
 /*

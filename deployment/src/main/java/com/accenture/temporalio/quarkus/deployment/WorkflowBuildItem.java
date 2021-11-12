@@ -1,24 +1,24 @@
 package com.accenture.temporalio.quarkus.deployment;
 
-import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItems;
+import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.builder.item.SimpleBuildItem;
 
 public final class WorkflowBuildItem extends SimpleBuildItem {
 
-    private TemporalBuildItems temporalBuildItems;
+    private TemporalBuildItem temporalBuildItem;
 
-    public WorkflowBuildItem(TemporalBuildItems temporalBuildItems) {
-        this.temporalBuildItems = temporalBuildItems;
+    public WorkflowBuildItem(TemporalBuildItem temporalBuildItem) {
+        this.temporalBuildItem = temporalBuildItem;
     }
 
     public WorkflowBuildItem() {
     }
 
-    public TemporalBuildItems getTemporalBuildItems() {
-        return temporalBuildItems;
+    public TemporalBuildItem getTemporalBuildItems() {
+        return temporalBuildItem;
     }
 
-    public void setTemporalBuildItems(TemporalBuildItems temporalBuildItems) {
-        this.temporalBuildItems = temporalBuildItems;
+    public void setTemporalBuildItems(TemporalBuildItem temporalBuildItem) {
+        this.temporalBuildItem = temporalBuildItem;
     }
 }

@@ -1,7 +1,8 @@
 package com.accenture.temporalio.quarkus.deployment;
 
+import com.accenture.temporalio.quarkus.runtime.GenericSupplier;
 import com.accenture.temporalio.quarkus.runtime.TemporalProducer;
-import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItems;
+import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.SyntheticBeanBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -28,14 +29,14 @@ class QuarkusTemporalioProcessor {
     @BuildStep
     WorkflowBuildItem workflowBuildItens(BuildProducer<SyntheticBeanBuildItem> syntheticBeanBuildItemBuildProducer,
                                          CombinedIndexBuildItem combinedIndex) {
-        TemporalBuildItems temporalBuildItems = new TemporalBuildItems();
+        TemporalBuildItem temporalBuildItem = new TemporalBuildItem();
 
-        SyntheticBeanBuildItem runtimeConfigBuildItem = SyntheticBeanBuildItem.configure(TemporalBuildItems.class)
+        SyntheticBeanBuildItem runtimeConfigBuildItem = SyntheticBeanBuildItem.configure(TemporalBuildItem.class)
                 .scope(Singleton.class)
-                .supplier(() -> temporalBuildItems)
+                .supplier(new GenericSupplier<>(temporalBuildItem))
                 .done();
 
         syntheticBeanBuildItemBuildProducer.produce(runtimeConfigBuildItem);
-        return new WorkflowBuildItem(temporalBuildItems);
+        return new WorkflowBuildItem(temporalBuildItem);
     }
 }
