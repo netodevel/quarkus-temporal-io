@@ -22,8 +22,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
 import io.temporal.client.WorkflowClient;
+import io.temporal.client.WorkflowOptions;
 
-@Path("/quarkus-temporalio")
+@Path("/hello")
 @ApplicationScoped
 public class QuarkusTemporalioResource {
 
@@ -32,6 +33,9 @@ public class QuarkusTemporalioResource {
 
     @GET
     public String hello() {
-        return "Hello quarkus-temporalio";
+        var workflow = workflowClient.newWorkflowStub(GreetingWorkflow.class, WorkflowOptions.newBuilder()
+                .setWorkflowId("HelloActivityWorkFlow").setTaskQueue("HelloActivityTaskQueue").build());
+
+        return workflow.getGreeting("World");
     }
 }

@@ -1,7 +1,6 @@
 package com.accenture.temporalio.quarkus.runtime;
 
 import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
-import io.quarkus.arc.DefaultBean;
 import io.quarkus.runtime.Startup;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
@@ -18,42 +17,57 @@ public class TemporalProducer {
     private static final Logger LOGGER = Logger.getLogger(TemporalProducer.class);
 
     @Produces
-    @DefaultBean
+    @ApplicationScoped
     WorkflowServiceStubs workflowService() {
         return WorkflowServiceStubs.newInstance();
     }
 
     @Produces
-    @DefaultBean
+    @ApplicationScoped
     WorkflowClient workflowClient(WorkflowServiceStubs service) {
         return WorkflowClient.newInstance(service);
     }
 
     @Produces
-    @DefaultBean
+    @ApplicationScoped
     WorkerFactory workerFactory(WorkflowClient client) {
         return WorkerFactory.newInstance(client);
     }
 
     @Produces
+    @ApplicationScoped
     @Startup
     public Worker temporalWorker(WorkerFactory workerFactory, TemporalBuildItem worklowBuildItens) {
-        // Worker that listens on a task queue and hosts both workflow and activity implementations.
         var worker = workerFactory.newWorker("quarkus-temporal-worker");
+        var classLoader = Thread.currentThread().getContextClassLoader();
 
-        System.out.println("itens" + worklowBuildItens);
+        System.out.println("recording workflows");
+        System.out.println("workflows: " + worklowBuildItens.getListOfWorkflows().toString());
+        for (String clazzName : worklowBuildItens.getListOfWorkflows()) {
+            try {
+                Class<?> clazz = classLoader.loadClass(clazzName);
+                worker.registerWorkflowImplementationTypes(clazz);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
 
-        // Workflows are stateful. So you need a type to create instances.
-/*
-        worker.registerWorkflowImplementationTypes(TripBookingWorkflowImpl.class);
-*/
-/*
-        System.out.println(trip.reserveCar("xpto"));
-*/
-/*
-        worker.registerActivitiesImplementations(new TripBookingActivitiesImpl());
-*/
-        // Start all workers created by this factory.
+        System.out.println("recording activities...");
+        System.out.println("activities: " + worklowBuildItens.getListOfActivities().toString());
+
+        for (String clazzName : worklowBuildItens.getListOfActivities()) {
+            try {
+                Class<?> clazz = classLoader.loadClass(clazzName);
+                System.out.println("name: " + clazz.getName());
+                for (Class<?> interfaces : clazz.getInterfaces()) {
+                    System.out.println("interface: " + interfaces.getName());
+                }
+                worker.registerActivitiesImplementations(clazz.newInstance()); //how to register to arc container
+            } catch (Exception e) {
+                System.out.println("error = " + e.getMessage());
+                System.out.println("cause = " + e.getCause().toString());
+            }
+        }
 
         workerFactory.start();
         LOGGER.info("worker started");

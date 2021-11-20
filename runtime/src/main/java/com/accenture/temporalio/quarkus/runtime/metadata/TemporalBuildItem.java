@@ -1,33 +1,29 @@
 package com.accenture.temporalio.quarkus.runtime.metadata;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class TemporalBuildItem {
 
-    private final class TemporalItems {
-        public String className;
-        public String type;
-
-        public TemporalItems() {
-        }
-
-        public TemporalItems(String className, String type) {
-            this.className = className;
-            this.type = type;
-        }
-    }
-
-    private Map<Class, TemporalItems> buildItens = new HashMap<>();
+    public List<String> listOfActivities = new ArrayList<>();
+    public List<String> listOfWorkflows = new ArrayList<>();
 
     public TemporalBuildItem() {
     }
 
-    public void put(Class clazz, String type) {
-        buildItens.put(clazz, new TemporalItems(clazz.getName(), type));
+    public void putActivity(String clazz) {
+        listOfActivities.add(clazz);
     }
 
-    public Map<Class, TemporalItems> getBuildItens() {
-        return buildItens;
+    public void putWorkflow(String clazz) {
+        listOfWorkflows.add(clazz);
+    }
+
+    public List<String> getListOfActivities() {
+        return listOfActivities;
+    }
+
+    public List<String> getListOfWorkflows() {
+        return listOfWorkflows;
     }
 }
