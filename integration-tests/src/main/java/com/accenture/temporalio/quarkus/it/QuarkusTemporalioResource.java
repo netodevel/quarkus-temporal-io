@@ -16,6 +16,8 @@
 */
 package com.accenture.temporalio.quarkus.it;
 
+import java.util.UUID;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -34,7 +36,7 @@ public class QuarkusTemporalioResource {
     @GET
     public String hello() {
         var workflow = workflowClient.newWorkflowStub(GreetingWorkflow.class, WorkflowOptions.newBuilder()
-                .setWorkflowId("HelloActivityWorkFlow").setTaskQueue("HelloActivityTaskQueue").build());
+                .setWorkflowId(UUID.randomUUID().toString()).setTaskQueue("quarkus-temporal-worker").build());
 
         return workflow.getGreeting("World");
     }

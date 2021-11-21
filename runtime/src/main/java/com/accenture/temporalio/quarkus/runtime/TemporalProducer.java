@@ -4,14 +4,12 @@ import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.runtime.Startup;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
-import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
-@ApplicationScoped
 public class TemporalProducer {
 
     private static final Logger LOGGER = Logger.getLogger(TemporalProducer.class);
@@ -30,20 +28,15 @@ public class TemporalProducer {
 
     @Produces
     @ApplicationScoped
-    WorkerFactory workerFactory(WorkflowClient client) {
-        return WorkerFactory.newInstance(client);
-    }
-
-    @Produces
-    @ApplicationScoped
     @Startup
-    public Worker temporalWorker(WorkerFactory workerFactory, TemporalBuildItem worklowBuildItens) {
-        var worker = workerFactory.newWorker("quarkus-temporal-worker");
+    public WorkerFactory temporalWorker(WorkflowClient workflowClient, TemporalBuildItem workflowBuildItems) {
+        var factory =  WorkerFactory.newInstance(workflowClient);
+        var worker = factory.newWorker("quarkus-temporal-worker");
         var classLoader = Thread.currentThread().getContextClassLoader();
 
         System.out.println("recording workflows");
-        System.out.println("workflows: " + worklowBuildItens.getListOfWorkflows().toString());
-        for (String clazzName : worklowBuildItens.getListOfWorkflows()) {
+        System.out.println("workflows: " + workflowBuildItems.getListOfWorkflows().toString());
+        for (String clazzName : workflowBuildItems.getListOfWorkflows()) {
             try {
                 Class<?> clazz = classLoader.loadClass(clazzName);
                 worker.registerWorkflowImplementationTypes(clazz);
@@ -53,9 +46,9 @@ public class TemporalProducer {
         }
 
         System.out.println("recording activities...");
-        System.out.println("activities: " + worklowBuildItens.getListOfActivities().toString());
+        System.out.println("activities: " + workflowBuildItems.getListOfActivities().toString());
 
-        for (String clazzName : worklowBuildItens.getListOfActivities()) {
+        for (String clazzName : workflowBuildItems.getListOfActivities()) {
             try {
                 Class<?> clazz = classLoader.loadClass(clazzName);
                 System.out.println("name: " + clazz.getName());
@@ -69,8 +62,8 @@ public class TemporalProducer {
             }
         }
 
-        workerFactory.start();
+        factory.start();
         LOGGER.info("worker started");
-        return worker;
+        return factory;
     }
 }

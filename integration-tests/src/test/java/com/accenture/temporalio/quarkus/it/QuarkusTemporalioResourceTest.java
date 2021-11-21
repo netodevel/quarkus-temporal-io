@@ -13,9 +13,9 @@ public class QuarkusTemporalioResourceTest {
     @Test
     public void testHelloEndpoint() {
         given()
-                .when().get("/quarkus-temporalio")
+                .when().get("/hello")
                 .then()
                 .statusCode(200)
-                .body(is("Hello quarkus-temporalio"));
+                .body(is("Hello World"));
     }
 }
