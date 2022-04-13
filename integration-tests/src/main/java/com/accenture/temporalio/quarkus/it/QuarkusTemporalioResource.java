@@ -29,7 +29,6 @@ import io.temporal.client.WorkflowOptions;
 @Path("/hello")
 @ApplicationScoped
 public class QuarkusTemporalioResource {
-
     @Inject
     WorkflowClient workflowClient;
 
@@ -37,7 +36,6 @@ public class QuarkusTemporalioResource {
     public String hello() {
         var workflow = workflowClient.newWorkflowStub(GreetingWorkflow.class, WorkflowOptions.newBuilder()
                 .setWorkflowId(UUID.randomUUID().toString()).setTaskQueue("quarkus-temporal-worker").build());
-
         return workflow.getGreeting("World");
     }
 }
