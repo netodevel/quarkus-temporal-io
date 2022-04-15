@@ -1,5 +1,6 @@
 package com.accenture.temporalio.quarkus.runtime;
 
+import com.accenture.temporalio.quarkus.runtime.annotation.Workflow;
 import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.runtime.Startup;
 import io.temporal.client.WorkflowClient;
@@ -39,6 +40,10 @@ public class TemporalProducer {
         for (String clazzName : workflowBuildItems.getListOfWorkflows()) {
             try {
                 Class<?> clazz = classLoader.loadClass(clazzName);
+                Workflow workflowAnnotation = clazz.getAnnotation(Workflow.class);
+
+                System.out.println("queue_name: " + workflowAnnotation.queue());
+
                 worker.registerWorkflowImplementationTypes(clazz);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
