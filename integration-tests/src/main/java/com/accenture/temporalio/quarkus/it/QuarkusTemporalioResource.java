@@ -28,17 +28,12 @@ import java.util.UUID;
 @Path("/hello")
 @ApplicationScoped
 public class QuarkusTemporalioResource {
+
     @Inject
     WorkflowClient workflowClient;
 
-    //@Inject
-    //GreetingWorkflowImpl implementationInjected;
-
-    //@Inject
-    //WorkflowBuilder workflowBuilder;
-
     @GET
-    public String runWorkflowNativeMode() {
+    public String runWorkflowPureWay() {
         var workflow = workflowClient.newWorkflowStub(GreetingWorkflow.class, WorkflowOptions.newBuilder()
                 .setWorkflowId(UUID.randomUUID().toString())
                 .setTaskQueue("quarkus-temporal-worker") // queue-name should be equal a workflow
@@ -46,9 +41,4 @@ public class QuarkusTemporalioResource {
         return workflow.getGreeting("World");
     }
 
-    @GET
-    public String runWorkflowAbstractionMode() {
-        //workflow.builder(implementationInject?, workflowOptions?).getGreeting("");
-        return "from abstract mode";
-    }
 }

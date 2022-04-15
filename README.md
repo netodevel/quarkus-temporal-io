@@ -1,22 +1,25 @@
 # quarkus-temporal.io
 
+### Dependencies
+
+- Java 11
+- GraalVM
+- Docker, Docker-compose (to run temporal.io Stack)
+- Quarkus CLI
+- Maven
+
+### How to build
+
+you can run ````mvn clean install```` in root directory.
+
+
+### How to use
+
 **Current Features**
 
 - Produces bean to ```WorkflowClient```, ```WorkflowServiceStub```, ```WorkerFactory```
-- Create works automatically to workflows
+- Create temporal workers automatically
 - register workflows and activies automatically
-    - we need create a queue name once time
 
 **To do**
-
-Register workflows or activies with a ARC bean.
-
-**To ways of run a workflow**
-
-- Native Way
-
-    Using directly sdk of temporal.io
-
-- Abstraction Way
-
-    Using us abstraction
+- native-image executable (Todo)
