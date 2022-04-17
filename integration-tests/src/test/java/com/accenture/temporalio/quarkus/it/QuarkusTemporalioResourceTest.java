@@ -17,6 +17,6 @@ public class QuarkusTemporalioResourceTest {
                 .when().get("/hello")
                 .then()
                 .statusCode(200)
-                .body(is("Hello World!"));
+                .body(is("hello world temporal.io with quarkus"));
     }
 }

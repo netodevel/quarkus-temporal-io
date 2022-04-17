@@ -2,6 +2,8 @@ package com.accenture.temporalio.quarkus.runtime;
 
 import com.accenture.temporalio.quarkus.runtime.annotation.Workflow;
 import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
+import io.quarkus.arc.Arc;
+import io.quarkus.arc.Unremovable;
 import io.quarkus.runtime.Startup;
 import io.temporal.client.WorkflowClient;
 import io.temporal.serviceclient.WorkflowServiceStubs;
@@ -11,18 +13,21 @@ import org.jboss.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
+@Unremovable
 public class TemporalProducer {
 
     private static final Logger LOGGER = Logger.getLogger(TemporalProducer.class);
 
     @Produces
     @ApplicationScoped
+    @Unremovable
     WorkflowServiceStubs workflowService() {
         return WorkflowServiceStubs.newInstance();
     }
 
     @Produces
     @ApplicationScoped
+    @Unremovable
     WorkflowClient workflowClient(WorkflowServiceStubs service) {
         return WorkflowClient.newInstance(service);
     }
@@ -30,6 +35,7 @@ public class TemporalProducer {
     @Produces
     @ApplicationScoped
     @Startup
+    @Unremovable
     public WorkerFactory temporalWorker(WorkflowClient workflowClient, TemporalBuildItem workflowBuildItems) {
         var factory =  WorkerFactory.newInstance(workflowClient);
         var worker = factory.newWorker("quarkus-temporal-worker");
@@ -60,7 +66,12 @@ public class TemporalProducer {
                 for (Class<?> interfaces : clazz.getInterfaces()) {
                     System.out.println("interface: " + interfaces.getName());
                 }
-                worker.registerActivitiesImplementations(clazz.newInstance()); //how to register to arc container
+
+                //how to register to arc container
+                Object activityInjectedToRegister = Arc.container().select(clazz).get();
+                System.out.println(activityInjectedToRegister.toString());
+                worker.registerActivitiesImplementations(activityInjectedToRegister);
+
             } catch (Exception e) {
                 System.out.println("error = " + e.getMessage());
                 System.out.println("cause = " + e.getCause().toString());
