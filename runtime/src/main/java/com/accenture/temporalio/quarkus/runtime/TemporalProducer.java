@@ -1,6 +1,6 @@
 package com.accenture.temporalio.quarkus.runtime;
 
-import com.accenture.temporalio.quarkus.runtime.annotation.Workflow;
+import com.accenture.temporalio.quarkus.runtime.annotation.SelfRegisterWorkflow;
 import com.accenture.temporalio.quarkus.runtime.metadata.TemporalBuildItem;
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.Unremovable;
@@ -46,7 +46,7 @@ public class TemporalProducer {
         for (String clazzName : workflowBuildItems.getListOfWorkflows()) {
             try {
                 Class<?> clazz = classLoader.loadClass(clazzName);
-                Workflow workflowAnnotation = clazz.getAnnotation(Workflow.class);
+                SelfRegisterWorkflow workflowAnnotation = clazz.getAnnotation(SelfRegisterWorkflow.class);
 
                 System.out.println("queue_name: " + workflowAnnotation.queue());
 

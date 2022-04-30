@@ -1,0 +1,6 @@
+[
+  ["com.accenture.temporalio.quarkus.it.GreetingActivities", "io.temporal.internal.sync.AsyncInternal$AsyncMarker"],
+  ["com.accenture.temporalio.quarkus.it.GreetingWorkflow", "io.temporal.internal.sync.StubMarker"],
+  ["io.temporal.serviceclient.WorkflowServiceStubs"],
+  ["io.temporal.client.WorkflowClient"]
+]

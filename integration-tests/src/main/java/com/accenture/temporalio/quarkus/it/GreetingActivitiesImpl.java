@@ -1,13 +1,12 @@
 package com.accenture.temporalio.quarkus.it;
 
-import com.accenture.temporalio.quarkus.runtime.annotation.Activity;
+import com.accenture.temporalio.quarkus.runtime.annotation.SelfRegisterActivity;
 import io.quarkus.arc.Unremovable;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
-@Activity
+@SelfRegisterActivity
 @ApplicationScoped
 @Unremovable //TODO: make this more automatically
 public class GreetingActivitiesImpl implements GreetingActivities {

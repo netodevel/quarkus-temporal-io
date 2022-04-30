@@ -2,6 +2,7 @@ package com.accenture.temporalio.quarkus.it;
 
 import java.time.Duration;
 
+import com.accenture.temporalio.quarkus.runtime.annotation.SelfRegisterWorkflow;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.workflow.Workflow;
 
@@ -14,7 +15,7 @@ import io.temporal.workflow.Workflow;
  *  https://community.temporal.io/t/how-to-register-a-spring-boot-workflow-implementation/71
  *
  */
-@com.accenture.temporalio.quarkus.runtime.annotation.Workflow(queue = "greeting-queue")
+@SelfRegisterWorkflow(queue = "greeting-queue")
 public class GreetingWorkflowImpl implements GreetingWorkflow {
 
     private final GreetingActivities activities = Workflow.newActivityStub(GreetingActivities.class,
