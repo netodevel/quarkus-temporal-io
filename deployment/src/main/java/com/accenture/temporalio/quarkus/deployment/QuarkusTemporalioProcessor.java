@@ -34,56 +34,40 @@ class QuarkusTemporalioProcessor {
 
     static final DotName NAME_RESOLVER_PROVIDER = DotName.createSimple(NameResolverProvider.class.getName());
 
-
     @BuildStep
     FeatureBuildItem feature() {
         return new FeatureBuildItem(FEATURE);
     }
 
-    @BuildStep
-    void build(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
-        additionalBeans.produce(AdditionalBeanBuildItem.builder().addBeanClass(TemporalProducer.class).build());
-    }
+
 
     @BuildStep
-    WorkflowBuildItem workflowBuildItens(BuildProducer<SyntheticBeanBuildItem> syntheticBeanBuildItemBuildProducer,
-                                         CombinedIndexBuildItem combinedIndex) {
-        TemporalBuildItem temporalBuildItem = new TemporalBuildItem();
-
-        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(SelfRegisterActivity.class.getName()))) {
+    void temporalReflections(BuildProducer<ReflectiveClassBuildItem> reflections, CombinedIndexBuildItem combinedIndex) {
+        System.out.println("reflection ========");
+        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(ActivityInterface.class.getName()))) {
             String activityClassName = ai.target().asClass().name().toString();
-            temporalBuildItem.putActivity(activityClassName);
+            reflections.produce(new ReflectiveClassBuildItem(true, true, true, activityClassName));
         }
 
-        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(SelfRegisterWorkflow.class.getName()))) {
-            String workflowClassName = ai.target().asClass().name().toString();
-            temporalBuildItem.putWorkflow(workflowClassName);
+        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(WorkflowInterface.class.getName()))) {
+            String activityClassName = ai.target().asClass().name().toString();
+            reflections.produce(new ReflectiveClassBuildItem(true, true, true, activityClassName));
         }
-
-        SyntheticBeanBuildItem runtimeConfigBuildItem = SyntheticBeanBuildItem.configure(TemporalBuildItem.class)
-                .scope(Singleton.class)
-                .supplier(new GenericSupplier<>(temporalBuildItem))
-                .done();
-
-        syntheticBeanBuildItemBuildProducer.produce(runtimeConfigBuildItem);
-        return new WorkflowBuildItem(temporalBuildItem);
     }
-
-//    @BuildStep
-//    public void configureIncompleteClassPath(BuildProducer<NativeImageAllowIncompleteClasspathBuildItem> incompleteClasspathBuildItem) {
-//        incompleteClasspathBuildItem.produce(new NativeImageAllowIncompleteClasspathBuildItem(FEATURE));
-//
-//    }
-
 
     @BuildStep
     void configureProxies(BuildProducer<NativeImageProxyDefinitionBuildItem> proxies, CombinedIndexBuildItem combinedIndex) {
+        System.out.println("configure proxiesss=====>");
+
         // proxies to async internal
         List<String> proxysToAsyncInternal = new ArrayList<>();
         for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(ActivityInterface.class.getName()))) {
             String activityClassName = ai.target().asClass().name().toString();
             proxysToAsyncInternal.add(activityClassName);
         }
+
+
+        System.out.println(proxysToAsyncInternal.toString());
 
         proxysToAsyncInternal.add("io.temporal.internal.sync.AsyncInternal$AsyncMarker");
         proxies.produce(new NativeImageProxyDefinitionBuildItem(proxysToAsyncInternal));
@@ -94,6 +78,8 @@ class QuarkusTemporalioProcessor {
             String activityClassName = ai.target().asClass().name().toString();
             proxiesToStubMarker.add(activityClassName);
         }
+        System.out.println(proxiesToStubMarker.toString());
+
         proxiesToStubMarker.add("io.temporal.internal.sync.StubMarker");
         proxies.produce(new NativeImageProxyDefinitionBuildItem(proxiesToStubMarker));
 
@@ -108,6 +94,7 @@ class QuarkusTemporalioProcessor {
 
     @BuildStep
     void registerReflecttionsNettyShaded(BuildProducer<ReflectiveClassBuildItem> reflections, CombinedIndexBuildItem combinedIndex) {
+        System.out.println("reflection shaded ========");
         ReflectiveClassBuildItem buildItem = new ReflectiveClassBuildItem(true, true, true,
                 "io.grpc.netty.shaded.io.netty.channel.socket.nio.NioSocketChannel",
                 "io.grpc.netty.shaded.io.netty.util.internal.NativeLibraryUtil",
@@ -172,5 +159,38 @@ class QuarkusTemporalioProcessor {
         runtimePackages.produce(new RuntimeInitializedPackageBuildItem("io.grpc.netty.shaded.io.netty.channel.unix"));
 
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.internal.RetriableStream"));
+    }
+
+
+
+    @BuildStep
+    void build(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
+        System.out.println("build ========");
+        additionalBeans.produce(AdditionalBeanBuildItem.builder().addBeanClass(TemporalProducer.class).build());
+    }
+
+    @BuildStep
+    WorkflowBuildItem workflowBuildItens(BuildProducer<SyntheticBeanBuildItem> syntheticBeanBuildItemBuildProducer,
+                                         CombinedIndexBuildItem combinedIndex) {
+        System.out.println("build itens ========");
+        TemporalBuildItem temporalBuildItem = new TemporalBuildItem();
+
+        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(SelfRegisterActivity.class.getName()))) {
+            String activityClassName = ai.target().asClass().name().toString();
+            temporalBuildItem.putActivity(activityClassName);
+        }
+
+        for (AnnotationInstance ai : combinedIndex.getIndex().getAnnotations(DotName.createSimple(SelfRegisterWorkflow.class.getName()))) {
+            String workflowClassName = ai.target().asClass().name().toString();
+            temporalBuildItem.putWorkflow(workflowClassName);
+        }
+
+        SyntheticBeanBuildItem runtimeConfigBuildItem = SyntheticBeanBuildItem.configure(TemporalBuildItem.class)
+                .scope(Singleton.class)
+                .supplier(new GenericSupplier<>(temporalBuildItem))
+                .done();
+
+        syntheticBeanBuildItemBuildProducer.produce(runtimeConfigBuildItem);
+        return new WorkflowBuildItem(temporalBuildItem);
     }
 }
