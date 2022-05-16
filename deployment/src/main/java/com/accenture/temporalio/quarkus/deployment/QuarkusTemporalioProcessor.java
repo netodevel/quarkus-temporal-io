@@ -39,8 +39,6 @@ class QuarkusTemporalioProcessor {
         return new FeatureBuildItem(FEATURE);
     }
 
-
-
     @BuildStep
     void temporalReflections(BuildProducer<ReflectiveClassBuildItem> reflections, CombinedIndexBuildItem combinedIndex) {
         System.out.println("reflection ========");
@@ -141,6 +139,7 @@ class QuarkusTemporalioProcessor {
     @BuildStep
     public void runTimeInitializationForNettyShaded(BuildProducer<RuntimeInitializedClassBuildItem> runtimeInitialized,
                                                     BuildProducer<RuntimeInitializedPackageBuildItem> runtimePackages) {
+/*
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.OpenSsl"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.OpenSslContext"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.ReferenceCountedOpenSslEngine"));
@@ -149,6 +148,8 @@ class QuarkusTemporalioProcessor {
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.JettyAlpnSslEngine$ClientEngine"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.JettyAlpnSslEngine$ServerEngine"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl.JettyNpnSslEngine"));
+*/
+        runtimePackages.produce(new RuntimeInitializedPackageBuildItem("io.grpc.netty.shaded.io.netty.handler.ssl"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.internal.tcnative.SSL"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.internal.tcnative.CertificateVerifier"));
         runtimeInitialized.produce(new RuntimeInitializedClassBuildItem("io.grpc.netty.shaded.io.netty.internal.tcnative.SSLPrivateKeyMethod"));
